@@ -19,6 +19,26 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-sharing",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Wallet to access your camera to scan QR codes.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Wallet to access your photos to upload your passport image.",
+          "cameraPermission": "Allow Wallet to access your camera to take a verification selfie.",
+          "microphonePermission": false
+        }
+      ]
+    ]
   }
 }
