@@ -3,15 +3,18 @@ import { StyleSheet, Text, View } from 'react-native';
 import { showAlert } from '../../utils/alert';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import Select from '../../components/Select';
 import Screen from '../../components/Screen';
 import * as authApi from '../../api/auth';
 import { apiErrorMessage } from '../../api/client';
+import { COUNTRIES } from '../../constants/countries';
 import { colors } from '../../theme/colors';
 import { spacing, fontSize } from '../../theme/spacing';
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [nationality, setNationality] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -19,6 +22,7 @@ export default function RegisterScreen({ navigation }) {
     const next = {};
     if (name.trim().length < 2) next.name = 'Enter your full name.';
     if (!/^\+?[0-9]{10,15}$/.test(phone.trim())) next.phone = 'Enter a valid phone number.';
+    if (!nationality) next.nationality = 'Select your nationality.';
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -27,7 +31,7 @@ export default function RegisterScreen({ navigation }) {
     if (!validate()) return;
     setLoading(true);
     try {
-      await authApi.register(name.trim(), phone.trim());
+      await authApi.register(name.trim(), phone.trim(), nationality);
       navigation.navigate('VerifyOtp', { phone: phone.trim(), purpose: 'registration' });
     } catch (e) {
       showAlert('Registration failed', apiErrorMessage(e));
@@ -57,6 +61,14 @@ export default function RegisterScreen({ navigation }) {
           onChangeText={setPhone}
           error={errors.phone}
           keyboardType="phone-pad"
+        />
+        <Select
+          label="Nationality"
+          placeholder="Select your nationality"
+          value={nationality}
+          onChange={setNationality}
+          options={COUNTRIES}
+          error={errors.nationality}
         />
         <Button title="Send OTP" onPress={handleSubmit} loading={loading} style={{ marginTop: spacing.sm }} />
       </View>

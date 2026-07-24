@@ -11,6 +11,7 @@ import { radius, spacing, fontSize } from '../../theme/spacing';
 const MENU = [
   { key: 'banks', label: 'Bank accounts', icon: 'business-outline', screen: 'BankList' },
   { key: 'verification', label: 'Identity verification', icon: 'shield-checkmark-outline', screen: 'Verification' },
+  { key: 'nationality', label: 'Nationality', icon: 'flag-outline', screen: 'ChangeNationality' },
   { key: 'card', label: 'Virtual card', icon: 'card-outline', screen: 'VirtualCard' },
   { key: 'limits', label: 'Transaction limits', icon: 'speedometer-outline', screen: 'Limits' },
   { key: 'pin', label: 'Change PIN', icon: 'keypad-outline', screen: 'ChangePin' },
@@ -38,6 +39,7 @@ export default function ProfileScreen({ navigation }) {
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.meta}>{user?.phone}</Text>
         <Text style={styles.meta}>{user?.upi_handle}</Text>
+        {user?.nationality ? <Text style={styles.meta}>{user.nationality}</Text> : null}
         <View style={styles.tierBadge}>
           <Text style={styles.tierText}>{user?.tier?.toUpperCase()} TIER</Text>
         </View>
