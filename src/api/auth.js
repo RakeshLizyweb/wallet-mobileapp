@@ -1,7 +1,7 @@
 import api from './client';
 
-export function register(name, phone) {
-  return api.post('/auth/register', { name, phone });
+export function register(name, phone, nationality) {
+  return api.post('/auth/register', { name, phone, nationality });
 }
 
 export function login(phone) {
@@ -26,6 +26,10 @@ export function resetPin(phone, otp, pin, pin_confirmation) {
 
 export function me() {
   return api.get('/auth/me');
+}
+
+export function updateNationality(nationality) {
+  return api.put('/auth/nationality', { nationality });
 }
 
 export function logout() {

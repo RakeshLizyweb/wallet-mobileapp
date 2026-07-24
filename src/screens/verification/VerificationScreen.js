@@ -48,14 +48,16 @@ export default function VerificationScreen({ navigation }) {
     <Screen>
       <Text style={styles.title}>Identity verification</Text>
       <Text style={styles.subtitle}>
-        Verify your passport to raise your transaction limits and unlock a virtual Visa card.
+        Verify your passport or citizen ID to raise your transaction limits and unlock a virtual Visa card.
       </Text>
 
       {verification ? (
         <Card style={styles.card}>
           <Text style={[styles.status, { color: statusMeta?.color }]}>{statusMeta?.title}</Text>
-          <Text style={styles.detail}>Passport: {verification.passport_number}</Text>
-          <Text style={styles.detail}>Expiry: {verification.passport_expiry}</Text>
+          <Text style={styles.detail}>
+            {verification.document_type === 'citizen_id' ? 'Citizen ID' : 'Passport'}: {verification.document_number}
+          </Text>
+          <Text style={styles.detail}>Expiry: {verification.document_expiry}</Text>
           {verification.rejection_reason ? (
             <Text style={styles.reason}>Reason: {verification.rejection_reason}</Text>
           ) : null}

@@ -7,10 +7,18 @@ import Input from '../../components/Input';
 import Screen from '../../components/Screen';
 import * as verificationApi from '../../api/verification';
 import { apiErrorMessage } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import { colors } from '../../theme/colors';
 import { radius, spacing, fontSize } from '../../theme/spacing';
 
 function toUploadFile(asset, fallbackName) {
+  // On web, expo-image-picker gives a real File (asset.file) meant for
+  // FormData uploads — the {uri, type, name} shape below only works with
+  // native's networking layer, and on web silently stringifies to
+  // "[object Object]", which is why the file arrives as "not an image".
+  if (asset.file) {
+    return asset.file;
+  }
   return {
     uri: asset.uri,
     type: asset.mimeType || 'image/jpeg',
@@ -19,20 +27,24 @@ function toUploadFile(asset, fallbackName) {
 }
 
 export default function SubmitVerificationScreen({ navigation }) {
-  const [passportNumber, setPassportNumber] = useState('');
-  const [passportExpiry, setPassportExpiry] = useState('');
-  const [passportImage, setPassportImage] = useState(null);
+  const { user } = useAuth();
+  const isIvoryCoast = (user?.nationality || '').trim().toLowerCase() === 'ivory coast';
+  const documentLabel = isIvoryCoast ? 'Citizen ID' : 'Passport';
+
+  const [documentNumber, setDocumentNumber] = useState('');
+  const [documentExpiry, setDocumentExpiry] = useState('');
+  const [documentImage, setDocumentImage] = useState(null);
   const [selfieImage, setSelfieImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const pickPassportImage = async () => {
+  const pickDocumentImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      showAlert('Permission needed', 'Allow photo library access to upload your passport.');
+      showAlert('Permission needed', `Allow photo library access to upload your ${documentLabel.toLowerCase()}.`);
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 });
-    if (!result.canceled) setPassportImage(result.assets[0]);
+    if (!result.canceled) setDocumentImage(result.assets[0]);
   };
 
   const takeSelfie = async () => {
@@ -50,25 +62,25 @@ export default function SubmitVerificationScreen({ navigation }) {
   };
 
   const handleSubmit = async () => {
-    if (!passportNumber.trim()) {
-      showAlert('Missing passport number', 'Enter your passport number.');
+    if (!documentNumber.trim()) {
+      showAlert(`Missing ${documentLabel.toLowerCase()} number`, `Enter your ${documentLabel.toLowerCase()} number.`);
       return;
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(passportExpiry.trim())) {
-      showAlert('Invalid date', 'Enter the passport expiry as YYYY-MM-DD.');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(documentExpiry.trim())) {
+      showAlert('Invalid date', `Enter the ${documentLabel.toLowerCase()} expiry as YYYY-MM-DD.`);
       return;
     }
-    if (!passportImage || !selfieImage) {
-      showAlert('Missing photos', 'Upload a passport photo and a selfie to continue.');
+    if (!documentImage || !selfieImage) {
+      showAlert('Missing photos', `Upload a ${documentLabel.toLowerCase()} photo and a selfie to continue.`);
       return;
     }
 
     setLoading(true);
     try {
       await verificationApi.submitVerification({
-        passport_number: passportNumber.trim(),
-        passport_expiry: passportExpiry.trim(),
-        passportImage: toUploadFile(passportImage, 'passport.jpg'),
+        document_number: documentNumber.trim(),
+        document_expiry: documentExpiry.trim(),
+        documentImage: toUploadFile(documentImage, 'document.jpg'),
         selfieImage: toUploadFile(selfieImage, 'selfie.jpg'),
       });
       showAlert('Submitted', 'Your verification is now under review.', [
@@ -84,23 +96,28 @@ export default function SubmitVerificationScreen({ navigation }) {
   return (
     <Screen>
       <Text style={styles.title}>Verify your identity</Text>
-      <Text style={styles.subtitle}>Your passport must be valid for at least 6 more months.</Text>
+      <Text style={styles.subtitle}>Your {documentLabel.toLowerCase()} must be valid for at least 6 more months.</Text>
 
-      <Input label="Passport number" placeholder="P1234567" value={passportNumber} onChangeText={setPassportNumber} />
       <Input
-        label="Passport expiry (YYYY-MM-DD)"
+        label={`${documentLabel} number`}
+        placeholder={isIvoryCoast ? 'CI1234567' : 'P1234567'}
+        value={documentNumber}
+        onChangeText={setDocumentNumber}
+      />
+      <Input
+        label={`${documentLabel} expiry (YYYY-MM-DD)`}
         placeholder="2030-01-01"
-        value={passportExpiry}
-        onChangeText={setPassportExpiry}
+        value={documentExpiry}
+        onChangeText={setDocumentExpiry}
         keyboardType="numbers-and-punctuation"
       />
 
-      <Text style={styles.label}>Passport photo</Text>
-      <Pressable style={styles.uploadBox} onPress={pickPassportImage}>
-        {passportImage ? (
-          <Image source={{ uri: passportImage.uri }} style={styles.preview} resizeMode="cover" />
+      <Text style={styles.label}>{documentLabel} photo</Text>
+      <Pressable style={styles.uploadBox} onPress={pickDocumentImage}>
+        {documentImage ? (
+          <Image source={{ uri: documentImage.uri }} style={styles.preview} resizeMode="cover" />
         ) : (
-          <Text style={styles.uploadHint}>Tap to upload a photo of your passport</Text>
+          <Text style={styles.uploadHint}>Tap to upload a photo of your {documentLabel.toLowerCase()}</Text>
         )}
       </Pressable>
 

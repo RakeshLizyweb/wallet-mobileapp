@@ -8,6 +8,7 @@ import SubmitVerificationScreen from '../screens/verification/SubmitVerification
 import VirtualCardScreen from '../screens/verification/VirtualCardScreen';
 import LimitsScreen from '../screens/profile/LimitsScreen';
 import ChangePinScreen from '../screens/profile/ChangePinScreen';
+import ChangeNationalityScreen from '../screens/profile/ChangeNationalityScreen';
 import DevicesScreen from '../screens/profile/DevicesScreen';
 import AccountSettingsScreen from '../screens/profile/AccountSettingsScreen';
 import { colors } from '../theme/colors';
@@ -33,6 +34,7 @@ export default function ProfileStack() {
       <Stack.Screen name="VirtualCard" component={VirtualCardScreen} options={{ title: '' }} />
       <Stack.Screen name="Limits" component={LimitsScreen} options={{ title: '' }} />
       <Stack.Screen name="ChangePin" component={ChangePinScreen} options={{ title: '' }} />
+      <Stack.Screen name="ChangeNationality" component={ChangeNationalityScreen} options={{ title: '' }} />
       <Stack.Screen name="Devices" component={DevicesScreen} options={{ title: '' }} />
       <Stack.Screen name="AccountSettings" component={AccountSettingsScreen} options={{ title: '' }} />
     </Stack.Navigator>
