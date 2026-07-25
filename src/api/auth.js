@@ -60,14 +60,6 @@ export function changePin(current_pin, pin, pin_confirmation) {
   return api.put('/pin', { current_pin, pin, pin_confirmation });
 }
 
-export function listDevices() {
-  return api.get('/devices');
-}
-
 export function updateFcmToken(device_id, fcm_token) {
   return api.post('/devices/fcm-token', { device_id, fcm_token });
-}
-
-export function removeDevice(deviceId) {
-  return api.delete(`/devices/${deviceId}`);
 }

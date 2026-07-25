@@ -4,6 +4,14 @@ export function walletToWallet(receiver, amount, pin, note) {
   return api.post('/transfers/wallet-to-wallet', { receiver, amount, pin, note });
 }
 
+export function accountToAccount(receiver, amount, pin, note) {
+  return api.post('/transfers/account-to-account', { receiver, amount, pin, note });
+}
+
+export function accountToWallet(amount, pin, note) {
+  return api.post('/transfers/account-to-wallet', { amount, pin, note });
+}
+
 export function walletToBank(bank_account_id, amount, pin, note) {
   return api.post('/transfers/wallet-to-bank', { bank_account_id, amount, pin, note });
 }

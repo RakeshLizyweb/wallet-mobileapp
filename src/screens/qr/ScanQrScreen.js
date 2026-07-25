@@ -20,7 +20,9 @@ export default function ScanQrScreen({ navigation }) {
     setChecking(true);
     try {
       const res = await qrApi.validateQr(data);
-      navigation.replace('SendMoney', { receiver: res.data.upi_handle });
+      navigation.replace('SendMoney', {
+        recipient: { name: res.data.name, identifier: res.data.upi_handle, subtitle: res.data.upi_handle },
+      });
     } catch (e) {
       showAlert('Invalid QR code', apiErrorMessage(e, 'This QR code could not be recognized.'), [
         { text: 'Try again', onPress: () => setScanned(false) },

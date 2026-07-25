@@ -7,11 +7,7 @@ import { formatCurrency } from '../../utils/format';
 import { colors } from '../../theme/colors';
 import { radius, spacing, fontSize } from '../../theme/spacing';
 
-const PERIODS = [
-  { key: 'daily', label: 'Daily' },
-  { key: 'monthly', label: 'Monthly' },
-  { key: 'yearly', label: 'Yearly' },
-];
+const PERIODS = [{ key: 'monthly', label: 'Monthly' }];
 
 export default function LimitsScreen() {
   const [usage, setUsage] = useState(null);
