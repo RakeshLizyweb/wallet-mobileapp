@@ -6,20 +6,20 @@ import Button from '../../components/Button';
 import Card from '../../components/Card';
 import EmptyState from '../../components/EmptyState';
 import Input from '../../components/Input';
+import PinPromptModal from '../../components/PinPromptModal';
 import Screen from '../../components/Screen';
 import * as banksApi from '../../api/banks';
 import * as transfersApi from '../../api/transfers';
 import { apiErrorMessage } from '../../api/client';
-import { useAuth } from '../../context/AuthContext';
+import { formatCurrency } from '../../utils/format';
 import { colors } from '../../theme/colors';
 import { spacing, fontSize } from '../../theme/spacing';
 
 export default function WithdrawScreen({ navigation }) {
-  const { sessionPin, lockApp } = useAuth();
   const [banks, setBanks] = useState([]);
   const [selectedBankId, setSelectedBankId] = useState(null);
   const [amount, setAmount] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [showPinPrompt, setShowPinPrompt] = useState(false);
   const [loadingBanks, setLoadingBanks] = useState(true);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function WithdrawScreen({ navigation }) {
       .finally(() => setLoadingBanks(false));
   }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!selectedBankId) {
       showAlert('Select a bank account', 'Add a verified bank account first.');
       return;
@@ -43,22 +43,13 @@ export default function WithdrawScreen({ navigation }) {
       showAlert('Invalid amount', 'Enter a valid amount to withdraw.');
       return;
     }
-    setLoading(true);
-    try {
-      const res = await transfersApi.walletToBank(selectedBankId, Number(amount), sessionPin);
-      navigation.replace('TransferSuccess', { transfer: res.data, message: 'Withdrawal successful' });
-    } catch (e) {
-      const message = apiErrorMessage(e);
-      if (e?.response?.status === 422 && /pin/i.test(message)) {
-        showAlert('PIN required', 'Please unlock the app again to confirm this withdrawal.', [
-          { text: 'OK', onPress: lockApp },
-        ]);
-      } else {
-        showAlert('Withdrawal failed', message);
-      }
-    } finally {
-      setLoading(false);
-    }
+    setShowPinPrompt(true);
+  };
+
+  const submitWithdrawal = async (pin) => {
+    const res = await transfersApi.walletToBank(selectedBankId, Number(amount), pin);
+    setShowPinPrompt(false);
+    navigation.replace('TransferSuccess', { transfer: res.data, message: 'Withdrawal successful' });
   };
 
   return (
@@ -107,7 +98,15 @@ export default function WithdrawScreen({ navigation }) {
         keyboardType="decimal-pad"
       />
 
-      <Button title="Withdraw" onPress={handleSubmit} loading={loading} style={{ marginTop: spacing.sm }} />
+      <Button title="Withdraw" onPress={handleSubmit} style={{ marginTop: spacing.sm }} />
+
+      <PinPromptModal
+        visible={showPinPrompt}
+        title="Confirm withdrawal"
+        subtitle={`Withdraw ${formatCurrency(Number(amount) || 0)} to your bank account`}
+        onSubmit={submitWithdrawal}
+        onCancel={() => setShowPinPrompt(false)}
+      />
     </Screen>
   );
 }

@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import Card from '../../components/Card';
 import Screen from '../../components/Screen';
 import * as walletApi from '../../api/wallet';
+import * as accountApi from '../../api/account';
 import { apiErrorMessage } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, formatDateTime } from '../../utils/format';
@@ -21,6 +22,7 @@ const ACTIONS = [
 export default function HomeScreen({ navigation }) {
   const { user, sessionPin } = useAuth();
   const [balance, setBalance] = useState(null);
+  const [accountBalance, setAccountBalance] = useState(null);
   const [activity, setActivity] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -29,12 +31,14 @@ export default function HomeScreen({ navigation }) {
   const load = useCallback(async () => {
     setError(null);
     try {
-      const [balanceRes, statementRes] = await Promise.all([
+      const [balanceRes, statementRes, accountRes] = await Promise.all([
         walletApi.getBalance(sessionPin),
         walletApi.getMiniStatement(),
+        accountApi.getBalance(sessionPin),
       ]);
       setBalance(balanceRes.data);
       setActivity(statementRes.data);
+      setAccountBalance(accountRes.data);
     } catch (e) {
       setError(apiErrorMessage(e));
     }
@@ -78,6 +82,21 @@ export default function HomeScreen({ navigation }) {
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <Text style={styles.walletNumber}>{balance?.wallet_number}</Text>
       </Card>
+
+      <Pressable onPress={() => navigation.navigate('Account')} style={{ marginBottom: spacing.lg }}>
+        <Card style={styles.accountRow}>
+          <View style={styles.accountIcon}>
+            <Ionicons name="business" size={20} color={colors.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.accountLabel}>Account balance</Text>
+            <Text style={styles.accountValue}>
+              {loading ? '—' : formatCurrency(accountBalance?.available_balance, accountBalance?.currency)}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+        </Card>
+      </Pressable>
 
       <View style={styles.actionsRow}>
         {ACTIONS.map((action) => (
@@ -164,6 +183,18 @@ const styles = StyleSheet.create({
   },
   walletNumber: { color: colors.primaryLight, fontSize: fontSize.xs, marginTop: spacing.sm },
   errorText: { color: colors.dangerLight, fontSize: fontSize.xs, marginTop: spacing.xs },
+  accountRow: { flexDirection: 'row', alignItems: 'center' },
+  accountIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
+  accountLabel: { fontSize: fontSize.xs, color: colors.textMuted },
+  accountValue: { fontSize: fontSize.md, fontWeight: '700', color: colors.text, marginTop: 2 },
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

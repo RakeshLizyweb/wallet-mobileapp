@@ -15,7 +15,6 @@ const MENU = [
   { key: 'card', label: 'Virtual card', icon: 'card-outline', screen: 'VirtualCard' },
   { key: 'limits', label: 'Transaction limits', icon: 'speedometer-outline', screen: 'Limits' },
   { key: 'pin', label: 'Change PIN', icon: 'keypad-outline', screen: 'ChangePin' },
-  { key: 'devices', label: 'Devices', icon: 'phone-portrait-outline', screen: 'Devices' },
 ];
 
 export default function ProfileScreen({ navigation }) {
