@@ -13,7 +13,7 @@ import { colors } from '../../theme/colors';
 import { radius, spacing, fontSize } from '../../theme/spacing';
 
 const ACTIONS = [
-  { key: 'send', label: 'Send', icon: 'arrow-up-circle', screen: 'SendMoney' },
+  { key: 'send', label: 'Send Money', icon: 'arrow-up-circle', screen: 'SendMoney' },
   { key: 'scan', label: 'Scan & Pay', icon: 'qr-code', screen: 'ScanQr' },
   { key: 'add', label: 'Add Money', icon: 'add-circle', screen: 'AddMoney' },
   { key: 'withdraw', label: 'Withdraw', icon: 'arrow-down-circle', screen: 'Withdraw' },
