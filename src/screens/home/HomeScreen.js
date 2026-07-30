@@ -12,14 +12,14 @@ import { formatCurrency, formatDateTime } from '../../utils/format';
 import { colors } from '../../theme/colors';
 import { radius, spacing, fontSize } from '../../theme/spacing';
 
-// "Add Money" and "Withdraw" move straight between the user's own Wallet
-// and Account — no bank account involved — reusing MoveToWalletScreen's
-// two directions instead of the separate bank-based screens.
+// "Add Money" moves straight from the user's own Account into their Wallet
+// — no bank account involved — reusing MoveToWalletScreen (which still has
+// its own toggle to go the other way, Wallet → Account, if needed).
 const ACTIONS = [
   { key: 'send', label: 'Send Money', icon: 'arrow-up-circle', screen: 'SendMoney' },
   { key: 'scan', label: 'Scan & Pay', icon: 'qr-code', screen: 'ScanQr' },
   { key: 'add', label: 'Add Money', icon: 'add-circle', screen: 'MoveToWallet', params: { direction: 'toWallet' } },
-  { key: 'withdraw', label: 'Withdraw', icon: 'arrow-down-circle', screen: 'MoveToWallet', params: { direction: 'toAccount' } },
+  { key: 'history', label: 'History', icon: 'time', tab: 'Transactions', screen: 'TransactionHistory' },
 ];
 
 export default function HomeScreen({ navigation }) {
@@ -114,7 +114,11 @@ export default function HomeScreen({ navigation }) {
           <Pressable
             key={action.key}
             style={styles.actionItem}
-            onPress={() => navigation.navigate(action.screen, action.params)}
+            onPress={() =>
+              action.tab
+                ? navigation.navigate(action.tab, { screen: action.screen })
+                : navigation.navigate(action.screen, action.params)
+            }
           >
             <View style={styles.actionIcon}>
               <Ionicons name={action.icon} size={26} color={colors.primary} />
@@ -126,7 +130,7 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Recent activity</Text>
-        <Pressable onPress={() => navigation.navigate('TransactionHistory')}>
+        <Pressable onPress={() => navigation.navigate('Transactions', { screen: 'TransactionHistory' })}>
           <Text style={styles.sectionLink}>See all</Text>
         </Pressable>
       </View>

@@ -11,7 +11,10 @@ import { radius, spacing, fontSize } from '../../theme/spacing';
 const MENU = [
   { key: 'banks', label: 'Bank accounts', icon: 'business-outline', screen: 'BankList' },
   { key: 'verification', label: 'Identity verification', icon: 'shield-checkmark-outline', screen: 'Verification' },
-  { key: 'nationality', label: 'Nationality', icon: 'flag-outline', screen: 'ChangeNationality' },
+  // Nationality is set once at registration and can't be changed afterward —
+  // shown here as a read-only row (no navigation, no chevron) rather than a
+  // regular menu item.
+  { key: 'nationality', label: 'Nationality', icon: 'flag-outline', readOnly: true },
   { key: 'card', label: 'Virtual card', icon: 'card-outline', screen: 'VirtualCard' },
   { key: 'limits', label: 'Transaction limits', icon: 'speedometer-outline', screen: 'Limits' },
   { key: 'pin', label: 'Change PIN', icon: 'keypad-outline', screen: 'ChangePin' },
@@ -45,13 +48,21 @@ export default function ProfileScreen({ navigation }) {
       </Card>
 
       <View style={styles.menu}>
-        {MENU.map((item) => (
-          <Pressable key={item.key} style={styles.menuItem} onPress={() => navigation.navigate(item.screen)}>
-            <Ionicons name={item.icon} size={20} color={colors.text} style={{ marginRight: spacing.sm }} />
-            <Text style={styles.menuLabel}>{item.label}</Text>
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-          </Pressable>
-        ))}
+        {MENU.map((item) =>
+          item.readOnly ? (
+            <View key={item.key} style={styles.menuItem}>
+              <Ionicons name={item.icon} size={20} color={colors.text} style={{ marginRight: spacing.sm }} />
+              <Text style={styles.menuLabel}>{item.label}</Text>
+              <Text style={styles.menuValue}>{user?.nationality || '—'}</Text>
+            </View>
+          ) : (
+            <Pressable key={item.key} style={styles.menuItem} onPress={() => navigation.navigate(item.screen)}>
+              <Ionicons name={item.icon} size={20} color={colors.text} style={{ marginRight: spacing.sm }} />
+              <Text style={styles.menuLabel}>{item.label}</Text>
+              <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
+            </Pressable>
+          )
+        )}
       </View>
 
       <Pressable style={styles.menuItem} onPress={confirmLogout}>
@@ -100,4 +111,5 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   menuLabel: { flex: 1, fontSize: fontSize.sm, fontWeight: '600', color: colors.text },
+  menuValue: { fontSize: fontSize.sm, fontWeight: '600', color: colors.textMuted },
 });

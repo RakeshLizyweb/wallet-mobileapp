@@ -28,10 +28,6 @@ export function me() {
   return api.get('/auth/me');
 }
 
-export function updateNationality(nationality) {
-  return api.put('/auth/nationality', { nationality });
-}
-
 export function logout() {
   return api.post('/auth/logout');
 }
