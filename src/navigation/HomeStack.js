@@ -3,8 +3,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/home/HomeScreen';
 import NotificationsScreen from '../screens/home/NotificationsScreen';
 import SendMoneyScreen from '../screens/transfer/SendMoneyScreen';
-import WithdrawScreen from '../screens/transfer/WithdrawScreen';
-import AddMoneyScreen from '../screens/transfer/AddMoneyScreen';
 import AccountScreen from '../screens/transfer/AccountScreen';
 import MoveToWalletScreen from '../screens/transfer/MoveToWalletScreen';
 import TransferSuccessScreen from '../screens/transfer/TransferSuccessScreen';
@@ -29,8 +27,6 @@ export default function HomeStack() {
       <Stack.Screen name="HomeMain" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
       <Stack.Screen name="SendMoney" component={SendMoneyScreen} options={{ title: '' }} />
-      <Stack.Screen name="Withdraw" component={WithdrawScreen} options={{ title: '' }} />
-      <Stack.Screen name="AddMoney" component={AddMoneyScreen} options={{ title: '' }} />
       <Stack.Screen name="Account" component={AccountScreen} options={{ title: '' }} />
       <Stack.Screen name="MoveToWallet" component={MoveToWalletScreen} options={{ title: '' }} />
       <Stack.Screen name="MyQr" component={MyQrScreen} options={{ headerShown: false }} />

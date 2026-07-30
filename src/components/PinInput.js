@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '../theme/colors';
 import { radius, spacing, fontSize } from '../theme/spacing';
@@ -6,6 +6,17 @@ import { radius, spacing, fontSize } from '../theme/spacing';
 export default function PinInput({ value, onChange, length = 6, autoFocus = true, secure = true }) {
   const inputRef = useRef(null);
   const digits = value.split('');
+
+  // TextInput's autoFocus prop is unreliable when this mounts inside a
+  // <Modal> (e.g. the PIN-confirmation prompt shown before a transfer) —
+  // the native modal window often isn't fully presented yet when autoFocus
+  // fires, so the keyboard never appears. A short delayed focus after mount
+  // fixes it without affecting plain full-screen usage (PinLockScreen, etc.).
+  useEffect(() => {
+    if (!autoFocus) return;
+    const timer = setTimeout(() => inputRef.current?.focus(), 250);
+    return () => clearTimeout(timer);
+  }, [autoFocus]);
 
   return (
     <Pressable onPress={() => inputRef.current?.focus()}>

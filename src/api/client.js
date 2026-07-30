@@ -23,7 +23,8 @@ function resolveBaseUrl() {
     return `http://${host}:8000/api/v1`;
   }
 
-  return 'http://localhost:8000/api/v1';
+  // return 'http://localhost:8000/api/v1';
+  return 'http://64.227.166.144/api/v1';
 }
 
 export const API_BASE_URL = resolveBaseUrl();

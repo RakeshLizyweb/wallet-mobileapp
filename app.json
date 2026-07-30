@@ -15,7 +15,11 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "package": "com.wallet.mobileapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -38,7 +42,20 @@
           "cameraPermission": "Allow Wallet to access your camera to take a verification selfie.",
           "microphonePermission": false
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "416e0f45-90ef-4ca4-b075-20583c6a3ded"
+      }
+    }
   }
 }

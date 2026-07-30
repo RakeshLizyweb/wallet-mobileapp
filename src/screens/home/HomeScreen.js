@@ -12,11 +12,14 @@ import { formatCurrency, formatDateTime } from '../../utils/format';
 import { colors } from '../../theme/colors';
 import { radius, spacing, fontSize } from '../../theme/spacing';
 
+// "Add Money" and "Withdraw" move straight between the user's own Wallet
+// and Account — no bank account involved — reusing MoveToWalletScreen's
+// two directions instead of the separate bank-based screens.
 const ACTIONS = [
-  { key: 'send', label: 'Send', icon: 'arrow-up-circle', screen: 'SendMoney' },
+  { key: 'send', label: 'Send Money', icon: 'arrow-up-circle', screen: 'SendMoney' },
   { key: 'scan', label: 'Scan & Pay', icon: 'qr-code', screen: 'ScanQr' },
-  { key: 'add', label: 'Add Money', icon: 'add-circle', screen: 'AddMoney' },
-  { key: 'withdraw', label: 'Withdraw', icon: 'arrow-down-circle', screen: 'Withdraw' },
+  { key: 'add', label: 'Add Money', icon: 'add-circle', screen: 'MoveToWallet', params: { direction: 'toWallet' } },
+  { key: 'withdraw', label: 'Withdraw', icon: 'arrow-down-circle', screen: 'MoveToWallet', params: { direction: 'toAccount' } },
 ];
 
 export default function HomeScreen({ navigation }) {
@@ -75,12 +78,20 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       <Card style={styles.balanceCard}>
-        <Text style={styles.balanceLabel}>Available balance</Text>
+        <Text style={styles.balanceLabel}>Wallet Balance</Text>
         <Text style={styles.balanceValue}>
           {loading ? '—' : formatCurrency(balance?.available_balance, balance?.currency)}
         </Text>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <Text style={styles.walletNumber}>{balance?.wallet_number}</Text>
+        <View style={styles.balanceFooter}>
+          <Text style={styles.walletNumber}>{balance?.wallet_number}</Text>
+          <Pressable
+            onPress={() => navigation.navigate('MoveToWallet', { direction: 'toAccount' })}
+            hitSlop={8}
+          >
+            <Text style={styles.moveLink}>Move to account ›</Text>
+          </Pressable>
+        </View>
       </Card>
 
       <Pressable onPress={() => navigation.navigate('Account')} style={{ marginBottom: spacing.lg }}>
@@ -89,7 +100,7 @@ export default function HomeScreen({ navigation }) {
             <Ionicons name="business" size={20} color={colors.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.accountLabel}>Account balance</Text>
+            <Text style={styles.accountLabel}>Account Balance</Text>
             <Text style={styles.accountValue}>
               {loading ? '—' : formatCurrency(accountBalance?.available_balance, accountBalance?.currency)}
             </Text>
@@ -103,7 +114,7 @@ export default function HomeScreen({ navigation }) {
           <Pressable
             key={action.key}
             style={styles.actionItem}
-            onPress={() => navigation.navigate(action.screen)}
+            onPress={() => navigation.navigate(action.screen, action.params)}
           >
             <View style={styles.actionIcon}>
               <Ionicons name={action.icon} size={26} color={colors.primary} />
@@ -181,7 +192,14 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     marginTop: spacing.xs,
   },
-  walletNumber: { color: colors.primaryLight, fontSize: fontSize.xs, marginTop: spacing.sm },
+  balanceFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  walletNumber: { color: colors.primaryLight, fontSize: fontSize.xs },
+  moveLink: { color: colors.textInverse, fontSize: fontSize.xs, fontWeight: '700' },
   errorText: { color: colors.dangerLight, fontSize: fontSize.xs, marginTop: spacing.xs },
   accountRow: { flexDirection: 'row', alignItems: 'center' },
   accountIcon: {
