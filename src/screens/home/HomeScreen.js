@@ -78,31 +78,34 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       <Card style={styles.balanceCard}>
-        <Text style={styles.balanceLabel}>Wallet Balance</Text>
+        <Text style={styles.balanceLabel}>Account Balance</Text>
         <Text style={styles.balanceValue}>
-          {loading ? '—' : formatCurrency(balance?.available_balance, balance?.currency)}
+          {loading ? '—' : formatCurrency(accountBalance?.available_balance, accountBalance?.currency)}
         </Text>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <View style={styles.balanceFooter}>
-          <Text style={styles.walletNumber}>{balance?.wallet_number}</Text>
+          <Text style={styles.walletNumber}>{accountBalance?.account_number}</Text>
           <Pressable
-            onPress={() => navigation.navigate('MoveToWallet', { direction: 'toAccount' })}
+            onPress={() => navigation.navigate('MoveToWallet', { direction: 'toWallet' })}
             hitSlop={8}
           >
-            <Text style={styles.moveLink}>Move to account ›</Text>
+            <Text style={styles.moveLink}>Move to wallet ›</Text>
           </Pressable>
         </View>
       </Card>
 
-      <Pressable onPress={() => navigation.navigate('Account')} style={{ marginBottom: spacing.lg }}>
+      <Pressable
+        onPress={() => navigation.navigate('MoveToWallet', { direction: 'toAccount' })}
+        style={{ marginBottom: spacing.lg }}
+      >
         <Card style={styles.accountRow}>
           <View style={styles.accountIcon}>
-            <Ionicons name="business" size={20} color={colors.primary} />
+            <Ionicons name="wallet" size={20} color={colors.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.accountLabel}>Account Balance</Text>
+            <Text style={styles.accountLabel}>Wallet Balance</Text>
             <Text style={styles.accountValue}>
-              {loading ? '—' : formatCurrency(accountBalance?.available_balance, accountBalance?.currency)}
+              {loading ? '—' : formatCurrency(balance?.available_balance, balance?.currency)}
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
