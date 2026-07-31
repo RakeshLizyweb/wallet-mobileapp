@@ -6,6 +6,7 @@ import Card from '../../components/Card';
 import Screen from '../../components/Screen';
 import * as walletApi from '../../api/wallet';
 import * as accountApi from '../../api/account';
+import * as transfersApi from '../../api/transfers';
 import { apiErrorMessage } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { formatCurrency, formatDateTime } from '../../utils/format';
@@ -26,7 +27,7 @@ export default function HomeScreen({ navigation }) {
   const { user, sessionPin } = useAuth();
   const [balance, setBalance] = useState(null);
   const [accountBalance, setAccountBalance] = useState(null);
-  const [activity, setActivity] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -34,13 +35,13 @@ export default function HomeScreen({ navigation }) {
   const load = useCallback(async () => {
     setError(null);
     try {
-      const [balanceRes, statementRes, accountRes] = await Promise.all([
+      const [balanceRes, contactsRes, accountRes] = await Promise.all([
         walletApi.getBalance(sessionPin),
-        walletApi.getMiniStatement(),
+        transfersApi.getRecentContacts(),
         accountApi.getBalance(sessionPin),
       ]);
       setBalance(balanceRes.data);
-      setActivity(statementRes.data);
+      setContacts(contactsRes.data);
       setAccountBalance(accountRes.data);
     } catch (e) {
       setError(apiErrorMessage(e));
@@ -138,43 +139,35 @@ export default function HomeScreen({ navigation }) {
         </Pressable>
       </View>
 
-      {activity.length === 0 && !loading ? (
+      {contacts.length === 0 && !loading ? (
         <Card>
-          <Text style={styles.emptyText}>No transactions yet. Send or add money to get started.</Text>
+          <Text style={styles.emptyText}>No recent transfers yet. Send money to get started.</Text>
         </Card>
       ) : (
-        activity.map((item, index) => (
-          <Card key={index} style={styles.activityCard}>
-            <View style={styles.activityRow}>
-              <View
-                style={[
-                  styles.activityIcon,
-                  { backgroundColor: item.type === 'credit' ? colors.successLight : colors.dangerLight },
-                ]}
-              >
-                <Ionicons
-                  name={item.type === 'credit' ? 'arrow-down' : 'arrow-up'}
-                  size={16}
-                  color={item.type === 'credit' ? colors.success : colors.danger}
-                />
+        contacts.map((contact, index) => (
+          <Pressable
+            key={index}
+            onPress={() =>
+              navigation.navigate('SendMoney', {
+                recipient: { name: contact.name, identifier: contact.phone, subtitle: contact.phone },
+              })
+            }
+          >
+            <Card style={styles.activityCard}>
+              <View style={styles.activityRow}>
+                <View style={styles.activityAvatar}>
+                  <Text style={styles.activityAvatarText}>{contact.name?.[0]?.toUpperCase() || '?'}</Text>
+                </View>
+                <View style={styles.activityInfo}>
+                  <Text style={styles.activityTitle} numberOfLines={1}>
+                    {contact.name}
+                  </Text>
+                  <Text style={styles.activityDate}>{formatDateTime(contact.last_transfer_at)}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
               </View>
-              <View style={styles.activityInfo}>
-                <Text style={styles.activityTitle} numberOfLines={1}>
-                  {item.description || item.category}
-                </Text>
-                <Text style={styles.activityDate}>{formatDateTime(item.created_at)}</Text>
-              </View>
-              <Text
-                style={[
-                  styles.activityAmount,
-                  { color: item.type === 'credit' ? colors.success : colors.text },
-                ]}
-              >
-                {item.type === 'credit' ? '+' : '-'}
-                {formatCurrency(item.amount)}
-              </Text>
-            </View>
-          </Card>
+            </Card>
+          </Pressable>
         ))
       )}
     </Screen>
@@ -247,16 +240,17 @@ const styles = StyleSheet.create({
   emptyText: { color: colors.textMuted, textAlign: 'center' },
   activityCard: { marginBottom: spacing.sm },
   activityRow: { flexDirection: 'row', alignItems: 'center' },
-  activityIcon: {
+  activityAvatar: {
     width: 36,
     height: 36,
     borderRadius: radius.pill,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.sm,
   },
+  activityAvatarText: { color: colors.textInverse, fontWeight: '800', fontSize: fontSize.sm },
   activityInfo: { flex: 1 },
   activityTitle: { fontSize: fontSize.sm, fontWeight: '600', color: colors.text },
   activityDate: { fontSize: fontSize.xs, color: colors.textMuted, marginTop: 2 },
-  activityAmount: { fontSize: fontSize.sm, fontWeight: '700' },
 });

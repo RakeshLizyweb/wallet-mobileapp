@@ -20,6 +20,10 @@ export function listTransfers(params = {}) {
   return api.get('/transfers', { params });
 }
 
+export function getRecentContacts() {
+  return api.get('/transfers/recent-contacts');
+}
+
 export function getTransfer(reference) {
   return api.get(`/transfers/${reference}`);
 }
