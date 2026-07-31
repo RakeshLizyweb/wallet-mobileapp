@@ -9,7 +9,6 @@ import { colors } from '../../theme/colors';
 import { radius, spacing, fontSize } from '../../theme/spacing';
 
 const MENU = [
-  { key: 'banks', label: 'Bank accounts', icon: 'business-outline', screen: 'BankList' },
   { key: 'verification', label: 'Identity verification', icon: 'shield-checkmark-outline', screen: 'Verification' },
   // Nationality is set once at registration and can't be changed afterward —
   // shown here as a read-only row (no navigation, no chevron) rather than a
