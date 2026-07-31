@@ -53,6 +53,7 @@ export default function ChangePinScreen({ navigation }) {
           keyboardType="number-pad"
           secureTextEntry
           maxLength={6}
+          autoFocus
         />
         <Input
           label="New PIN"

@@ -52,6 +52,7 @@ export default function SetPinScreen() {
           keyboardType="number-pad"
           secureTextEntry
           maxLength={6}
+          autoFocus
         />
         <Input
           label="Confirm PIN"
