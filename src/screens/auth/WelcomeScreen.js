@@ -11,9 +11,9 @@ export default function WelcomeScreen({ navigation }) {
       <View style={styles.container}>
         <View style={styles.logoWrap}>
           <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>W</Text>
+            <Text style={styles.logoText}>Z</Text>
           </View>
-          <Text style={styles.appName}>Wallet</Text>
+          <Text style={styles.appName}>Zemapay</Text>
           <Text style={styles.tagline}>Send, save and grow your money — all in one place.</Text>
         </View>
 

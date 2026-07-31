@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Mobile-App",
+    "name": "Zemapay",
     "slug": "Mobile-App",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -30,7 +30,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow Wallet to access your camera to scan QR codes.",
+          "cameraPermission": "Allow Zemapay to access your camera to scan QR codes.",
           "microphonePermission": false,
           "recordAudioAndroid": false
         }
@@ -38,8 +38,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow Wallet to access your photos to upload your passport image.",
-          "cameraPermission": "Allow Wallet to access your camera to take a verification selfie.",
+          "photosPermission": "Allow Zemapay to access your photos to upload your passport image.",
+          "cameraPermission": "Allow Zemapay to access your camera to take a verification selfie.",
           "microphonePermission": false
         }
       ],
