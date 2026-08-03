@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { showAlert } from '../../utils/alert';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import PinPromptModal from '../../components/PinPromptModal';
 import Screen from '../../components/Screen';
 import * as transfersApi from '../../api/transfers';
 import { formatCurrency } from '../../utils/format';
@@ -31,25 +30,28 @@ const COPY = {
 export default function MoveToWalletScreen({ route, navigation }) {
   const [direction, setDirection] = useState(route.params?.direction === 'toAccount' ? 'toAccount' : 'toWallet');
   const [amount, setAmount] = useState('');
-  const [showPinPrompt, setShowPinPrompt] = useState(false);
 
   const copy = COPY[direction];
-
-  const handleSubmit = () => {
-    if (!amount || Number(amount) <= 0) {
-      showAlert('Invalid amount', 'Enter a valid amount to move.');
-      return;
-    }
-    setShowPinPrompt(true);
-  };
 
   const submitMove = async (pin) => {
     const res =
       direction === 'toAccount'
         ? await transfersApi.walletToAccount(Number(amount), pin)
         : await transfersApi.accountToWallet(Number(amount), pin);
-    setShowPinPrompt(false);
-    navigation.replace('TransferSuccess', { transfer: res.data, message: copy.successMessage });
+    return res.data;
+  };
+
+  const handleSubmit = () => {
+    if (!amount || Number(amount) <= 0) {
+      showAlert('Invalid amount', 'Enter a valid amount to move.');
+      return;
+    }
+    navigation.navigate('ConfirmPin', {
+      title: 'Confirm transfer',
+      subtitle: copy.confirmSubtitle(formatCurrency(Number(amount) || 0)),
+      onConfirm: submitMove,
+      successMessage: copy.successMessage,
+    });
   };
 
   return (
@@ -95,14 +97,6 @@ export default function MoveToWalletScreen({ route, navigation }) {
       />
 
       <Button title={copy.buttonTitle} onPress={handleSubmit} style={{ marginTop: spacing.sm }} />
-
-      <PinPromptModal
-        visible={showPinPrompt}
-        title="Confirm transfer"
-        subtitle={copy.confirmSubtitle(formatCurrency(Number(amount) || 0))}
-        onSubmit={submitMove}
-        onCancel={() => setShowPinPrompt(false)}
-      />
     </Screen>
   );
 }

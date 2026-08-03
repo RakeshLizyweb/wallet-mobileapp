@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
-import PinPromptModal from '../../components/PinPromptModal';
 import Screen from '../../components/Screen';
 import * as transfersApi from '../../api/transfers';
 import * as usersApi from '../../api/users';
@@ -21,7 +20,6 @@ export default function SendMoneyScreen({ route, navigation }) {
   const [method, setMethod] = useState('wallet');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
-  const [showPinPrompt, setShowPinPrompt] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -79,18 +77,22 @@ export default function SendMoneyScreen({ route, navigation }) {
   const fee = Math.round(sendingAmount * PEER_TRANSFER_FEE_RATE * 100) / 100;
   const reachingAmount = Math.round((sendingAmount - fee) * 100) / 100;
 
-  const handleSend = () => {
-    if (!validate()) return;
-    setShowPinPrompt(true);
-  };
-
   const submitPayment = async (pin) => {
     const res =
       method === 'account'
         ? await transfersApi.accountToAccount(recipient.identifier, Number(amount), pin, note.trim() || undefined)
         : await transfersApi.walletToWallet(recipient.identifier, Number(amount), pin, note.trim() || undefined);
-    setShowPinPrompt(false);
-    navigation.replace('TransferSuccess', { transfer: res.data, message: 'Money sent successfully' });
+    return res.data;
+  };
+
+  const handleSend = () => {
+    if (!validate()) return;
+    navigation.navigate('ConfirmPin', {
+      title: 'Confirm payment',
+      subtitle: `Send ${formatCurrency(sendingAmount)} — ${recipient.name} gets ${formatCurrency(reachingAmount)}`,
+      onConfirm: submitPayment,
+      successMessage: 'Money sent successfully',
+    });
   };
 
   if (!recipient) {
@@ -215,14 +217,6 @@ export default function SendMoneyScreen({ route, navigation }) {
 
         <Button title="Send money" onPress={handleSend} style={{ marginTop: spacing.sm }} />
       </View>
-
-      <PinPromptModal
-        visible={showPinPrompt}
-        title="Confirm payment"
-        subtitle={`Send ${formatCurrency(sendingAmount)} — ${recipient.name} gets ${formatCurrency(reachingAmount)}`}
-        onSubmit={submitPayment}
-        onCancel={() => setShowPinPrompt(false)}
-      />
     </Screen>
   );
 }
