@@ -125,7 +125,7 @@ export default function HomeScreen({ navigation }) {
             }
           >
             <View style={styles.actionIcon}>
-              <Ionicons name={action.icon} size={26} color={colors.primary} />
+              <Ionicons name={action.icon} size={26} color={colors.secondary} />
             </View>
             <Text style={styles.actionLabel}>{action.label}</Text>
           </Pressable>
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: radius.pill,
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.secondaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.xs,

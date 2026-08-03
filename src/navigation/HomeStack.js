@@ -5,6 +5,7 @@ import NotificationsScreen from '../screens/home/NotificationsScreen';
 import SendMoneyScreen from '../screens/transfer/SendMoneyScreen';
 import AccountScreen from '../screens/transfer/AccountScreen';
 import MoveToWalletScreen from '../screens/transfer/MoveToWalletScreen';
+import ConfirmPinScreen from '../screens/transfer/ConfirmPinScreen';
 import TransferSuccessScreen from '../screens/transfer/TransferSuccessScreen';
 import TransactionDetailScreen from '../screens/transfer/TransactionDetailScreen';
 import ScanQrScreen from '../screens/qr/ScanQrScreen';
@@ -29,6 +30,7 @@ export default function HomeStack() {
       <Stack.Screen name="SendMoney" component={SendMoneyScreen} options={{ title: '' }} />
       <Stack.Screen name="Account" component={AccountScreen} options={{ title: '' }} />
       <Stack.Screen name="MoveToWallet" component={MoveToWalletScreen} options={{ title: '' }} />
+      <Stack.Screen name="ConfirmPin" component={ConfirmPinScreen} options={{ title: '' }} />
       <Stack.Screen name="MyQr" component={MyQrScreen} options={{ headerShown: false }} />
       <Stack.Screen
         name="ScanQr"
