@@ -1,27 +1,48 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { showAlert } from '../../utils/alert';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useIsFocused } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { showAlert } from '../../utils/alert';
 import Button from '../../components/Button';
-import Screen from '../../components/Screen';
 import * as qrApi from '../../api/qr';
 import { apiErrorMessage } from '../../api/client';
 import { colors } from '../../theme/colors';
 import { radius, spacing, fontSize } from '../../theme/spacing';
 
+// Fixed pixel size for the camera box. Deliberately NOT a flex/percentage/absoluteFillObject
+// size - a concrete number here means the camera view's layout can never resolve to a 0-height
+// box no matter what a parent container's flex layout does.
+const SCAN_BOX_SIZE = 280;
+
 export default function ScanQrScreen({ navigation }) {
-  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
+  const isFocused = useIsFocused();
 
-  const handleScanned = async ({ data }) => {
-    if (scanned || checking) return;
+  useEffect(() => {
+    if (permission && !permission.granted && permission.canAskAgain) {
+      requestPermission();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [permission?.granted, permission?.canAskAgain]);
+
+  const handleBarcodeScanned = async (event) => {
+    const qrData = event.data;
+    if (!qrData || scanned || checking) return;
+
     setScanned(true);
     setChecking(true);
     try {
-      const res = await qrApi.validateQr(data);
+      const res = await qrApi.validateQr(qrData);
       navigation.replace('SendMoney', {
-        recipient: { name: res.data.name, identifier: res.data.upi_handle, subtitle: res.data.upi_handle },
+        recipient: {
+          name: res.data.name,
+          identifier: res.data.upi_handle,
+          subtitle: res.data.upi_handle,
+        },
       });
     } catch (e) {
       showAlert('Invalid QR code', apiErrorMessage(e, 'This QR code could not be recognized.'), [
@@ -32,59 +53,129 @@ export default function ScanQrScreen({ navigation }) {
     }
   };
 
-  if (!permission) {
-    return (
-      <Screen scroll={false}>
-        <View style={styles.center}>
+  const renderScanBox = () => {
+    if (!permission) {
+      return (
+        <View style={styles.scanBox}>
           <ActivityIndicator color={colors.primary} />
         </View>
-      </Screen>
-    );
-  }
+      );
+    }
 
-  if (!permission.granted) {
-    return (
-      <Screen scroll={false}>
-        <View style={styles.center}>
-          <Text style={styles.permissionText}>We need camera access to scan QR codes.</Text>
-          <Button title="Grant camera access" onPress={requestPermission} style={{ marginTop: spacing.md }} />
+    if (!permission.granted) {
+      return (
+        <View style={styles.scanBox}>
+          <Ionicons name="camera-outline" size={36} color={colors.textMuted} />
+          <Text style={styles.permissionText}>
+            {permission.canAskAgain
+              ? 'Allow camera access to scan a Wallet QR code.'
+              : 'Camera access is disabled. Enable it in your device settings.'}
+          </Text>
+          {permission.canAskAgain && (
+            <Button title="Allow camera access" onPress={requestPermission} style={{ marginTop: spacing.md }} />
+          )}
         </View>
-      </Screen>
+      );
+    }
+
+    return (
+      <View style={styles.scanBox}>
+        {isFocused && (
+          <CameraView
+            style={styles.camera}
+            facing="back"
+            barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+            onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+          />
+        )}
+        {checking && (
+          <View style={styles.checkingOverlay}>
+            <ActivityIndicator color={colors.textInverse} />
+          </View>
+        )}
+      </View>
     );
-  }
+  };
 
   return (
-    <View style={styles.container}>
-      <CameraView
-        style={StyleSheet.absoluteFillObject}
-        facing="back"
-        barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
-        onBarcodeScanned={handleScanned}
-      />
-      <View style={styles.overlay}>
-        <View style={styles.frame} />
-        <Text style={styles.hint}>Point your camera at a Wallet QR code</Text>
-        {checking ? <ActivityIndicator color={colors.textInverse} style={{ marginTop: spacing.md }} /> : null}
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <View style={styles.header}>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backButton} hitSlop={12}>
+          <Ionicons name="chevron-back" size={26} color={colors.text} />
+        </Pressable>
+        <Text style={styles.title}>Scan QR Code</Text>
+        <View style={styles.backButton} />
       </View>
-    </View>
+
+      <View style={styles.body}>
+        {renderScanBox()}
+        <Text style={styles.hint}>Point your camera at a Wallet QR code</Text>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black' },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
-  permissionText: { color: colors.text, fontSize: fontSize.md, textAlign: 'center' },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
+  safe: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  frame: {
-    width: 240,
-    height: 240,
-    borderRadius: radius.md,
-    borderWidth: 3,
-    borderColor: colors.textInverse,
+  title: {
+    fontSize: fontSize.md,
+    fontWeight: '700',
+    color: colors.text,
   },
-  hint: { color: colors.textInverse, marginTop: spacing.lg, fontSize: fontSize.sm },
+  body: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  scanBox: {
+    width: SCAN_BOX_SIZE,
+    height: SCAN_BOX_SIZE,
+    borderRadius: radius.lg,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+  camera: {
+    width: SCAN_BOX_SIZE,
+    height: SCAN_BOX_SIZE,
+  },
+  checkingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  permissionText: {
+    color: colors.textMuted,
+    fontSize: fontSize.sm,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  hint: {
+    color: colors.textMuted,
+    fontSize: fontSize.sm,
+    textAlign: 'center',
+    marginTop: spacing.lg,
+  },
 });

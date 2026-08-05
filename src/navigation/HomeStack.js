@@ -32,11 +32,7 @@ export default function HomeStack() {
       <Stack.Screen name="MoveToWallet" component={MoveToWalletScreen} options={{ title: '' }} />
       <Stack.Screen name="ConfirmPin" component={ConfirmPinScreen} options={{ title: '' }} />
       <Stack.Screen name="MyQr" component={MyQrScreen} options={{ headerShown: false }} />
-      <Stack.Screen
-        name="ScanQr"
-        component={ScanQrScreen}
-        options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: colors.textInverse }}
-      />
+      <Stack.Screen name="ScanQr" component={ScanQrScreen} options={{ headerShown: false }} />
       <Stack.Screen name="TransferSuccess" component={TransferSuccessScreen} options={{ headerShown: false }} />
       <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} options={{ title: 'Transaction' }} />
     </Stack.Navigator>
