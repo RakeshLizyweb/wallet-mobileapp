@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { showAlert } from '../../utils/alert';
 import Button from '../../components/Button';
@@ -33,15 +33,14 @@ export default function MyQrScreen() {
 
   const writeQrToFile = async () => {
     if (!qr?.qr_image) return null;
-    const base64Data = qr.qr_image.includes('base64,') 
-      ? qr.qr_image.split('base64,')[1] 
+    const base64Data = qr.qr_image.includes('base64,')
+      ? qr.qr_image.split('base64,')[1]
       : qr.qr_image;
 
-    const fileUri = `${FileSystem.cacheDirectory}wallet-qr-${Date.now()}.png`;
-    await FileSystem.writeAsStringAsync(fileUri, base64Data, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    return fileUri;
+    const file = new File(Paths.cache, `wallet-qr-${Date.now()}.png`);
+    file.create({ overwrite: true });
+    file.write(base64Data, { encoding: 'base64' });
+    return file.uri;
   };
 
   const handleShare = async () => {
