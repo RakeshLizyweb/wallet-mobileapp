@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
-import { showAlert } from '../../utils/alert';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { showAlert } from '../../utils/alert';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
 import Screen from '../../components/Screen';
@@ -31,10 +31,15 @@ export default function MyQrScreen() {
     load();
   }, [load]);
 
-  const writeQrToFile = () => {
-    const base64 = qr.qr_image.split(',')[1];
+  const writeQrToFile = async () => {
+    if (!qr?.qr_image) return null;
+    const base64Data = qr.qr_image.includes('base64,')
+      ? qr.qr_image.split('base64,')[1]
+      : qr.qr_image;
+
     const file = new File(Paths.cache, `wallet-qr-${Date.now()}.png`);
-    file.write(base64, { encoding: 'base64' });
+    file.create({ overwrite: true });
+    file.write(base64Data, { encoding: 'base64' });
     return file.uri;
   };
 
@@ -42,7 +47,9 @@ export default function MyQrScreen() {
     if (!qr) return;
     setBusy(true);
     try {
-      const uri = writeQrToFile();
+      const uri = await writeQrToFile();
+      if (!uri) throw new Error('Failed to generate image file.');
+
       const available = await Sharing.isAvailableAsync();
       if (available) {
         await Sharing.shareAsync(uri, { dialogTitle: 'Share my Wallet QR code' });
@@ -60,8 +67,10 @@ export default function MyQrScreen() {
     if (!qr) return;
     setBusy(true);
     try {
-      writeQrToFile();
-      showAlert('Saved', 'Your QR code has been saved to this device.');
+      const uri = await writeQrToFile();
+      if (uri) {
+        showAlert('Saved', 'Your QR code image has been cached and ready on this device.');
+      }
     } catch (e) {
       showAlert('Could not save QR code', e.message);
     } finally {
@@ -73,7 +82,7 @@ export default function MyQrScreen() {
     return (
       <Screen scroll={false}>
         <View style={styles.center}>
-          <ActivityIndicator color={colors.primary} />
+          <ActivityIndicator color={colors.primary} size="large" />
         </View>
       </Screen>
     );
