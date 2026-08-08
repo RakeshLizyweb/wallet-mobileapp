@@ -247,14 +247,14 @@ export default function SendMoneyScreen({ route, navigation }) {
 
     return (
       <Screen scroll={false}>
+        <View style={styles.searchContainer}>
         <Text style={styles.title}>Send money</Text>
-        <Text style={styles.subtitle}>Search for someone by phone number, or scan their QR code.</Text>
+        <Text style={styles.subtitle}>Search by name or phone number, or scan their QR code.</Text>
 
         <Input
-          placeholder="Search by phone number"
+          placeholder="Search by name or phone number"
           value={query}
           onChangeText={setQuery}
-          keyboardType="phone-pad"
           autoFocus
         />
 
@@ -326,6 +326,7 @@ export default function SendMoneyScreen({ route, navigation }) {
             ) : null
           }
         />
+        </View>
       </Screen>
     );
   }
@@ -402,6 +403,7 @@ export default function SendMoneyScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  searchContainer: { flex: 1, paddingHorizontal: spacing.lg },
   title: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text, marginTop: spacing.md },
   subtitle: { fontSize: fontSize.sm, color: colors.textMuted, marginTop: spacing.xs, marginBottom: spacing.lg },
   form: { marginTop: spacing.sm },
