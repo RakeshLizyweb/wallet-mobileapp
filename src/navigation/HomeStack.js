@@ -2,6 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/home/HomeScreen';
 import NotificationsScreen from '../screens/home/NotificationsScreen';
+import ReferFriendScreen from '../screens/home/ReferFriendScreen';
 import SendMoneyScreen from '../screens/transfer/SendMoneyScreen';
 import AccountScreen from '../screens/transfer/AccountScreen';
 import MoveToWalletScreen from '../screens/transfer/MoveToWalletScreen';
@@ -27,6 +28,7 @@ export default function HomeStack() {
     <Stack.Navigator screenOptions={headerOptions}>
       <Stack.Screen name="HomeMain" component={HomeScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ReferFriend" component={ReferFriendScreen} options={{ title: '' }} />
       <Stack.Screen name="SendMoney" component={SendMoneyScreen} options={{ title: '' }} />
       <Stack.Screen name="Account" component={AccountScreen} options={{ title: '' }} />
       <Stack.Screen name="MoveToWallet" component={MoveToWalletScreen} options={{ title: '' }} />
