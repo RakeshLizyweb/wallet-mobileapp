@@ -1,7 +1,7 @@
 import api from './client';
 
-export function register(name, phone, nationality) {
-  return api.post('/auth/register', { name, phone, nationality });
+export function register(name, phone, nationality, referralCode) {
+  return api.post('/auth/register', { name, phone, nationality, referral_code: referralCode || undefined });
 }
 
 export function login(phone) {

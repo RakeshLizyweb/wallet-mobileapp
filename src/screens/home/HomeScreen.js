@@ -132,6 +132,19 @@ export default function HomeScreen({ navigation }) {
         ))}
       </View>
 
+      <Pressable onPress={() => navigation.navigate('ReferFriend')} style={{ marginBottom: spacing.lg }}>
+        <Card style={styles.referCard}>
+          <View style={styles.referIcon}>
+            <Ionicons name="people" size={22} color={colors.textInverse} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.referTitle}>Refer a Friend</Text>
+            <Text style={styles.referSubtitle}>Give 300 CFA, get 100 CFA for every friend who joins</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textInverse} />
+        </Card>
+      </Pressable>
+
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Recent activity</Text>
         <Pressable onPress={() => navigation.navigate('Transactions', { screen: 'TransactionHistory' })}>
@@ -229,6 +242,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   actionLabel: { fontSize: fontSize.xs, color: colors.text, textAlign: 'center', fontWeight: '600' },
+  referCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary, borderWidth: 0 },
+  referIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.pill,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
+  referTitle: { fontSize: fontSize.sm, fontWeight: '700', color: colors.textInverse },
+  referSubtitle: { fontSize: fontSize.xs, color: colors.primaryLight, marginTop: 2 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

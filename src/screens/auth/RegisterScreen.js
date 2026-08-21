@@ -11,10 +11,11 @@ import { COUNTRIES } from '../../constants/countries';
 import { colors } from '../../theme/colors';
 import { spacing, fontSize } from '../../theme/spacing';
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen({ navigation, route }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [nationality, setNationality] = useState('');
+  const [referralCode, setReferralCode] = useState(route?.params?.referralCode || '');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -31,7 +32,7 @@ export default function RegisterScreen({ navigation }) {
     if (!validate()) return;
     setLoading(true);
     try {
-      await authApi.register(name.trim(), phone.trim(), nationality);
+      await authApi.register(name.trim(), phone.trim(), nationality, referralCode.trim() || undefined);
       navigation.navigate('VerifyOtp', { phone: phone.trim(), purpose: 'registration' });
     } catch (e) {
       showAlert('Registration failed', apiErrorMessage(e));
@@ -69,6 +70,13 @@ export default function RegisterScreen({ navigation }) {
           onChange={setNationality}
           options={COUNTRIES}
           error={errors.nationality}
+        />
+        <Input
+          label="Referral code (optional)"
+          placeholder="e.g. AB12CD34"
+          value={referralCode}
+          onChangeText={(v) => setReferralCode(v.toUpperCase())}
+          autoCapitalize="characters"
         />
         <Button title="Send OTP" onPress={handleSubmit} loading={loading} style={{ marginTop: spacing.sm }} />
       </View>
